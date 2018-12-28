@@ -1,15 +1,20 @@
 ﻿using HtmlAgilityPack;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace MijiGenerator
 {
+    /// <summary>
+    /// html 转换器
+    /// 印象笔记
+    /// </summary>
     class MijiHtmlParser
     {
-
+        /// <summary>
+        /// 获取内部字符串
+        /// </summary>
+        /// <param name="htmlPath"></param>
+        /// <param name="xpath"></param>
+        /// <returns></returns>
         public string GetInnerText(string htmlPath, string xpath)
         {
             var doc = new HtmlDocument();
@@ -21,6 +26,12 @@ namespace MijiGenerator
             return innerText;
         }
 
+        /// <summary>
+        /// 获取内部 html
+        /// </summary>
+        /// <param name="htmlPath"></param>
+        /// <param name="xpath"></param>
+        /// <returns></returns>
         public string GetInnerHtml(string htmlPath, string xpath)
         {
             var doc = new HtmlDocument();

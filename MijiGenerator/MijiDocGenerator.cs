@@ -4,13 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace MijiGenerator
 {
+    /// <summary>
+    /// word 生成器
+    /// </summary>
     class MijiDocGenerator
     {
         public string TemplateFile { get; set; }
@@ -93,7 +93,11 @@ namespace MijiGenerator
             doc.Sections.Remove(section);
         }
 
-
+        /// <summary>
+        /// 计算出生的
+        /// </summary>
+        /// <param name="title"></param>
+        /// <returns></returns>
         private string CalcBornDay(string title)
         {
             var str_date = title.Split(' ')[0];
@@ -112,7 +116,20 @@ namespace MijiGenerator
 
             int month = (date.Year - miBirthday.Year) * 12 + (date.Month - miBirthday.Month) - (noenoughmonth ? 1 : 0);
 
-            return $"{month}个月{day}天";
+            //小于两岁则只显示月数
+            if (month < 24)
+            {
+                return $"{month}个月{day}天";
+            }
+            else
+            {
+                var year = month / 12;
+                month = month % 12;
+
+                //月数为0，则不显示
+                return month != 0 ? $"{year}岁{month}个月{day}天" : $"{year}岁{day}天";
+
+            }
         }
     }
 }
