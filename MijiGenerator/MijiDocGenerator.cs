@@ -1,9 +1,12 @@
 ﻿using Spire.Doc;
+using Spire.Doc.Documents;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace MijiGenerator
@@ -17,33 +20,79 @@ namespace MijiGenerator
             TemplateFile = template;
         }
 
+        private string _htmlPath;
+
         public bool Gen(string htmlPath)
         {
+            _htmlPath = htmlPath;
+
+            var doc = new Document(TemplateFile);
+
             Console.WriteLine($"Gen {htmlPath}");
             var parser = new MijiHtmlParser();
             var text = parser.GetInnerHtml(htmlPath, "//span");
             text = text.Replace("<div><br></div>", "\r\n").Replace("<div>", string.Empty).Replace("</div>", "\r\n").Trim();
 
-            var doc = new Document(TemplateFile);
+            string imgPattern = "<img src=\\\"(?<imgPath>\\d{8}.+?)\\\".*>";
 
+            List<string> imgPaths = new List<string>();
 
-            var title = Path.GetFileNameWithoutExtension(htmlPath);
+            foreach (Match m in Regex.Matches(text, imgPattern))
+            {
+                var path = m.Groups["imgPath"].Value;
+                imgPaths.Add(path);
+                text = text.Replace(m.Value, string.Empty);
+            }
+
+            ChangeBuiltin(doc);
+
+            ImportText(doc, text);
+            ImportImg(doc, imgPaths);
+
+            Directory.CreateDirectory("Output");
+            doc.SaveToFile($".\\Output\\{doc.BuiltinDocumentProperties.Title}.docx", FileFormat.Docx2013);
+            Console.WriteLine($"End {$".\\Output\\{doc.BuiltinDocumentProperties.Title}.docx"}");
+            return true;
+
+        }
+
+        private void ChangeBuiltin(Document doc)
+        {
+            var title = Path.GetFileNameWithoutExtension(_htmlPath);
             var subject = "觅记";
             var author = "觅哥带盐人";
             var comments = CalcBornDay(title);
-            doc.Replace("内容", text, true, false);
 
             doc.BuiltinDocumentProperties.Title = title;
             doc.BuiltinDocumentProperties.Subject = subject;
             doc.BuiltinDocumentProperties.Author = author;
             doc.BuiltinDocumentProperties.Comments = comments;
-
-            Directory.CreateDirectory("Output");
-            doc.SaveToFile($".\\Output\\{title}.docx", FileFormat.Docx2013);
-            Console.WriteLine($"End {$".\\Output\\{title}.docx"}");
-            return true;
-
         }
+
+        private void ImportText(Document doc, string text)
+        {
+            doc.Replace("内容", text, true, false);
+        }
+
+        private void ImportImg(Document doc, IEnumerable<string> imagePaths)
+        {
+            BookmarksNavigator bn = new BookmarksNavigator(doc);
+            bn.MoveToBookmark("插图", true, true);
+            Section section = doc.AddSection();
+
+            foreach (var path in imagePaths)
+            {
+                var graph = section.AddParagraph();
+                Image img = Image.FromFile("html/" + path);
+                var pic = graph.AppendPicture(img);
+                pic.HeightScale = 40f;
+                pic.WidthScale = 40f;
+                bn.InsertParagraph(graph);
+            }
+
+            doc.Sections.Remove(section);
+        }
+
 
         private string CalcBornDay(string title)
         {

@@ -32,5 +32,6 @@ namespace MijiGenerator
 
             return innerText;
         }
+
     }
 }
