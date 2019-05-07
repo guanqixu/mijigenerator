@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Spire.Doc;
+using System;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 /// <summary>
@@ -12,14 +14,32 @@ namespace MijiGenerator
         static void Main(string[] args)
         {
             Program p = new Program();
-            string input;
-            do
-            {
-                p.Gen();
+            string tips = @"Please enter the number:
+1. gen;
+2. merge;";
 
-                input = Console.ReadLine();
+            while (true)
+            {
+                Console.WriteLine(tips);
+                string input = Console.ReadLine();
+
+                switch (input)
+                {
+                    case "1":
+                        Console.WriteLine("gen doc");
+                        p.Gen();
+                        break;
+                    case "2":
+                        Console.WriteLine("merge doc");
+                        p.Merge();
+                        break;
+                    case "":
+                        return;
+                    default:
+                        Console.WriteLine("input error");
+                        break;
+                }
             }
-            while (input != "");
         }
 
 
@@ -35,6 +55,12 @@ namespace MijiGenerator
                     gen.Gen(file);
                 }
             }
+        }
+
+        public void Merge()
+        {
+            MijiDocMerger.MergePdf("output_doc");
+            //MijiDocMerger.MergePdf(Directory.EnumerateFiles("output_pdf", "*.pdf").ToArray(), "merge.pdf");
         }
     }
 }

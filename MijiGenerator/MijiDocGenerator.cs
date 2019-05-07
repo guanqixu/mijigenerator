@@ -44,14 +44,25 @@ namespace MijiGenerator
                 text = text.Replace(m.Value, string.Empty);
             }
 
+            //string imgCommend = "<div style.+?><span.+?>(?<imgCommend>.+?)</span>";
+
+            //List<string> imgCommends = new List<string>();
+            //foreach (Match m in Regex.Matches(text, imgCommend))
+            //{
+            //    var commend = m.Groups["imgCommend"].Value;
+            //    imgCommends.Add(commend);
+            //    text = text.Replace(m.Value, string.Empty);
+            //}
+
             ChangeBuiltin(doc);
 
             ImportText(doc, text);
             ImportImg(doc, imgPaths);
+            //ImportImgCommend(doc, imgCommends);
 
-            Directory.CreateDirectory("Output");
-            doc.SaveToFile($".\\Output\\{doc.BuiltinDocumentProperties.Title}.docx", FileFormat.Docx2013);
-            Console.WriteLine($"End {$".\\Output\\{doc.BuiltinDocumentProperties.Title}.docx"}");
+            Directory.CreateDirectory("output_doc");
+            doc.SaveToFile($".\\output_doc\\{doc.BuiltinDocumentProperties.Title}.docx", FileFormat.Docx2013);
+            Console.WriteLine($"End {$".\\output_doc\\{doc.BuiltinDocumentProperties.Title}.docx"}");
             return true;
 
         }
@@ -93,6 +104,12 @@ namespace MijiGenerator
             doc.Sections.Remove(section);
         }
 
+        private void ImportImgCommend(Document doc, List<string> commends)
+        {
+            string importText = string.Join(",", commends);
+            doc.Replace("图片描述", importText, true, false);
+        }
+
         /// <summary>
         /// 计算出生的
         /// </summary>
@@ -116,19 +133,19 @@ namespace MijiGenerator
 
             int month = (date.Year - miBirthday.Year) * 12 + (date.Month - miBirthday.Month) - (noenoughmonth ? 1 : 0);
 
+            var str_day = day != 0 ? $"{day}天" : string.Empty;
+
             //小于两岁则只显示月数
             if (month < 24)
             {
-                return $"{month}个月{day}天";
+                return $"{month}个月{str_day}";
             }
             else
             {
                 var year = month / 12;
                 month = month % 12;
-
-                //月数为0，则不显示
-                return month != 0 ? $"{year}岁{month}个月{day}天" : $"{year}岁{day}天";
-
+                var str_month = month != 0 ? $"{month}个月" : string.Empty;
+                return $"{year}岁{str_month}{str_day}";
             }
         }
     }

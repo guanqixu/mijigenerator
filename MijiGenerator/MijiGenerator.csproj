@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MijiDocGenerator.cs" />
+    <Compile Include="MijiDocMerger.cs" />
     <Compile Include="MijiHtmlParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
