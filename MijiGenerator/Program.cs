@@ -11,12 +11,21 @@ namespace MijiGenerator
 {
     class Program
     {
+        /// <summary>
+        /// 主函数
+        /// 
+        /// 1. html 转换成 docx
+        /// 2. docx 转换成 pdf
+        /// 3. 合并 pdf
+        /// </summary>
+        /// <param name="args"></param>
         static void Main(string[] args)
         {
             Program p = new Program();
             string tips = @"Please enter the number:
 1. gen;
-2. merge;";
+2. convert;
+3. merge;";
 
             while (true)
             {
@@ -30,8 +39,14 @@ namespace MijiGenerator
                         p.Gen();
                         break;
                     case "2":
-                        Console.WriteLine("merge doc");
-                        p.Merge();
+                        Console.WriteLine("Please enter docx dir path which to convert:");
+                        var path = Console.ReadLine();
+                        p.Convert(path);
+                        break;
+                    case "3":
+                        Console.WriteLine("Please enter pdf dir path which to merge:");
+                        path = Console.ReadLine();
+                        p.Merge(path);
                         break;
                     case "":
                         return;
@@ -42,7 +57,9 @@ namespace MijiGenerator
             }
         }
 
-
+        /// <summary>
+        /// 生成
+        /// </summary>
         public void Gen()
         {
             MijiDocGenerator gen = new MijiDocGenerator(@"..\..\Template.docx");
@@ -57,10 +74,32 @@ namespace MijiGenerator
             }
         }
 
-        public void Merge()
+        /// <summary>
+        /// 组合
+        /// </summary>
+        /// <param name="inputDir"></param>
+        public void Merge(string inputDir)
         {
-            MijiDocMerger.MergePdf("output_doc");
-            //MijiDocMerger.MergePdf(Directory.EnumerateFiles("output_pdf", "*.pdf").ToArray(), "merge.pdf");
+            inputDir = inputDir.Trim('"');
+            var inputFiles = Directory.GetFiles(inputDir, "*.pdf");
+            var merge = new PdfFileMerge(inputFiles);
+            var outputPath = Path.Combine(inputDir, "merge.pdf");
+            merge.Merge(outputPath);
         }
+
+        /// <summary>
+        /// 转换
+        /// </summary>
+        /// <param name="inputDir"></param>
+        public void Convert(string inputDir)
+        {
+            inputDir = inputDir.Trim('"');
+            var inputFiles = Directory.GetFiles(inputDir, "*.docx");
+            var outputDir = inputDir + "_pdf";
+
+            var converter = new PdfConvert(inputFiles);
+            converter.Convert(outputDir);
+        }
+
     }
 }

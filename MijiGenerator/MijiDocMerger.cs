@@ -49,7 +49,6 @@ namespace MijiGenerator
                 }
             }
 
-
             var pdf = PdfDocument.MergeFiles(Directory.EnumerateFiles("output_pdf", "*.pdf").ToArray());
             pdf.Save("output_pdf\\merge.pdf");
 
