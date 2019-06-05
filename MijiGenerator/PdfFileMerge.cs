@@ -28,7 +28,8 @@ namespace MijiGenerator
         /// <returns></returns>
         public bool Merge(string outputPath)
         {
-            PdfReader pr;
+            List<PdfReader> readers = new List<PdfReader>();
+
             PdfWriter pw;
             Document document;
 
@@ -42,7 +43,8 @@ namespace MijiGenerator
 
             foreach (var fileName in _files)
             {
-                pr = new PdfReader(fileName);
+                PdfReader pr = new PdfReader(fileName);
+                readers.Add(pr);
 
                 for (int i = 1; i <= pr.NumberOfPages; i++)
                 {
@@ -59,8 +61,17 @@ namespace MijiGenerator
                     document.Add(new Chunk());
                 }
             }
+            document.CloseDocument();
 
-            document.Close();
+            foreach (var pr in readers)
+            {
+                pr.Close();
+                pr.Dispose();
+            }
+
+            readers.Clear();
+
+            //document.Close();
             Console.WriteLine($"Merged {outputPath}");
             return true;
         }

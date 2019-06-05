@@ -33,6 +33,15 @@ namespace MijiGenerator
             var text = parser.GetInnerHtml(htmlPath, "//span");
             text = text.Replace("<div><br></div>", "\r\n").Replace("<div>", string.Empty).Replace("</div>", "\r\n").Trim();
 
+            //之后出现好多这种 br 标签，统一替换成回车换行符
+            text = text.Replace("<br clear=\"none\">", string.Empty)
+                .Replace("<span style=\"font-weight: bold;\">", string.Empty)
+                .Replace("</span>", string.Empty)
+                .Replace("<font style=\"font-size: 10pt;\">", string.Empty)
+                .Replace("<br>", string.Empty)
+                .Replace("</font>", string.Empty)
+                .Replace("<b>", string.Empty)
+                .Replace("</b>", string.Empty);
             string imgPattern = "<img src=\\\"(?<imgPath>\\d{8}.+?)\\\".*>";
 
             List<string> imgPaths = new List<string>();
@@ -43,16 +52,6 @@ namespace MijiGenerator
                 imgPaths.Add(path);
                 text = text.Replace(m.Value, string.Empty);
             }
-
-            //string imgCommend = "<div style.+?><span.+?>(?<imgCommend>.+?)</span>";
-
-            //List<string> imgCommends = new List<string>();
-            //foreach (Match m in Regex.Matches(text, imgCommend))
-            //{
-            //    var commend = m.Groups["imgCommend"].Value;
-            //    imgCommends.Add(commend);
-            //    text = text.Replace(m.Value, string.Empty);
-            //}
 
             ChangeBuiltin(doc);
 
@@ -98,6 +97,7 @@ namespace MijiGenerator
                 var pic = graph.AppendPicture(img);
                 pic.HeightScale = 40f;
                 pic.WidthScale = 40f;
+                pic.VerticalAlignment = ShapeVerticalAlignment.Center;
                 bn.InsertParagraph(graph);
             }
 

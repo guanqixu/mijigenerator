@@ -81,9 +81,9 @@ namespace MijiGenerator
         public void Merge(string inputDir)
         {
             inputDir = inputDir.Trim('"');
-            var inputFiles = Directory.GetFiles(inputDir, "*.pdf");
+            var inputFiles = Directory.GetFiles(inputDir, "20*.pdf");
             var merge = new PdfFileMerge(inputFiles);
-            var outputPath = Path.Combine(inputDir, "merge.pdf");
+            var outputPath = Path.Combine(inputDir, $"merge_{DateTime.Now.ToString("yyyyMMdd_hhmmss")}.pdf");
             merge.Merge(outputPath);
         }
 
